@@ -1,10 +1,8 @@
 <script lang="ts">
   import { base } from '$app/paths';
   import '../app.css';
-  import { fly, slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
 
-  const paypalUsername = 'AxelLab427';
-  const donationAmounts = [1, 3, 5, 10];
   let isDropdownOpen = false;
 
   function toggleDropdown() { isDropdownOpen = !isDropdownOpen; }
@@ -22,7 +20,9 @@
       }
     };
     document.addEventListener('click', handleClick, true);
-    return { destroy() { document.removeEventListener('click', handleClick, true); } };
+    return {
+      destroy() { document.removeEventListener('click', handleClick, true); }
+    };
   }
 </script>
 
@@ -40,17 +40,40 @@
       </button>
 
       <div class="position-relative" use:clickOutside on:click_outside={closeDropdown}>
-        <button class="btn-bmac d-flex align-items-center gap-2" on:click={toggleDropdown}>
-          <i class="bi bi-cup-hot-fill"></i>
-          <span class="d-none d-md-inline">Coffee</span>
+        <button 
+          class="btn-bmac d-flex align-items-center gap-2" 
+          on:click={toggleDropdown}
+          aria-label="Support options"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2,21V19H20V21H2M20,8V5H4V8H20M20,10H4V13C4,14.38 4.5,15.63 5.31,16.58L11.64,19H12.36L18.69,16.58C19.5,15.63 20,14.38 20,13V10M16,2H8V4H16V2Z" />
+          </svg>
+          <span class="d-none d-md-inline">Buy me a Coffee</span>
         </button>
+
         {#if isDropdownOpen}
-          <div class="position-absolute mt-2 p-2 glass rounded-4 shadow-lg" style="min-width: 100px;" transition:slide>
-            {#each donationAmounts as amount}
-              <a href="https://paypal.me/{paypalUsername}/{amount}" target="_blank" class="d-block p-2 text-center text-decoration-none rounded-3 donation-item" style="color: var(--text-main)" on:click={closeDropdown}>
-                ${amount}
-              </a>
-            {/each}
+          <div class="position-absolute mt-3 glass rounded-4 shadow-lg overflow-hidden bmac-dropdown-container" transition:fly={{ y: -10, duration: 250 }}>
+            <a href="https://buymeacoffee.com/axelbase" target="_blank" rel="noopener" class="donation-item" on:click={closeDropdown}>
+              <span class="amount">$3</span> One Coffee
+            </a>
+            <a href="https://buymeacoffee.com/axelbase" target="_blank" rel="noopener" class="donation-item" on:click={closeDropdown}>
+              <span class="amount">$5</span> Two Coffees
+            </a>
+            <a href="https://buymeacoffee.com/axelbase" target="_blank" rel="noopener" class="donation-item" on:click={closeDropdown}>
+              <span class="amount">$10</span> Three Coffees
+            </a>
+
+            <a href="https://buymeacoffee.com/axelbase" target="_blank" rel="noopener" class="donation-item custom-divider" on:click={closeDropdown}>
+              Custom Amount
+            </a>
+
+            <a 
+              href="bitcoin:bc1q3p0e6vt492m4w4fpz5m2cl4zcfuqqkgaj6myc9?label=AxelBase&message=Buy%20me%20a%20coffee" 
+              class="donation-item crypto-link" 
+              on:click={closeDropdown}
+            >
+              <i class="bi bi-currency-bitcoin"></i> Buy via Crypto
+            </a>
           </div>
         {/if}
       </div>
@@ -81,6 +104,56 @@
 </footer>
 
 <style>
-  .donation-item:hover { background: var(--primary-violet); color: white !important; }
-  .hover-rotate:hover { transform: rotate(15deg) scale(1.1); }
+  /* --- Dropdown Specific Styling --- */
+  .bmac-dropdown-container {
+    min-width: 220px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 1px solid var(--glass-border);
+  }
+
+  .donation-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+  }
+
+  .donation-item:hover {
+    background: var(--primary-violet);
+    color: white !important;
+    padding-left: 25px;
+  }
+
+  .donation-item .amount {
+    font-weight: 700;
+    color: var(--accent-light);
+    font-size: 1.1rem;
+    transition: color 0.2s ease;
+  }
+
+  .donation-item:hover .amount {
+    color: white;
+  }
+
+  .custom-divider {
+    border-top: 1px solid var(--glass-border);
+    justify-content: center !important;
+    font-weight: 600;
+  }
+
+  .crypto-link {
+    justify-content: center !important;
+    font-weight: 600;
+    background: rgba(255, 153, 0, 0.1); /* Slight Bitcoin Orange tint */
+  }
+
+  /* --- Existing Animation & Utility --- */
+  .hover-rotate:hover {
+    transform: rotate(15deg) scale(1.1);
+  }
 </style>
